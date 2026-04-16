@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1"
+    />
+    <title>대전세종충청지역 다제약물 관리사업</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css"
+    />
+    <script
+      src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      /* ── 기본 ── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          "NanumSquare",
+          -apple-system,
+          sans-serif;
+        background: #f8fafc;
+        color: #1e293b;
+        min-height: 100vh;
+      }
+
+      /* ── 공통 레이아웃 ── */
+      .page {
+        display: none;
+        min-height: 100vh;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px;
+      }
+      .page.active {
+        display: flex;
+      }
+      .inner {
+        width: 100%;
+        max-width: 448px;
+      }
+
+      /* ── 헤더 ── */
+      .page-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 32px;
+        margin-bottom: 40px;
+      }
+      .nhis-logo {
+        height: 56px;
+        object-fit: contain;
+        margin-bottom: 24px;
+      }
+      .page-title {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: #0f9689;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      /* ── 홈 제목 ── */
+      .home-title {
+        font-size: 2.2rem;
+        font-weight: 900;
+        text-align: center;
+        color: #0f172a;
+        line-height: 1.15;
+        margin-bottom: 12px;
+      }
+      .home-title .accent {
+        color: #0f9689;
+      }
+      .home-year {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #475569;
+        margin-bottom: 8px;
+      }
+
+      /* ── 카드 ── */
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .card.clickable {
+        cursor: pointer;
+      }
+      .card.clickable:active {
+        transform: scale(0.98);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-row {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        gap: 20px;
+      }
+      .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .card-icon svg {
+        width: 32px;
+        height: 32px;
+      }
+      .card-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1.3;
+      }
+      .card-desc {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-top: 2px;
+      }
+
+      /* ── 아이콘 배경색 ── */
+      .bg-green {
+        background: #f0fdf4;
+      }
+      .bg-purple {
+        background: #faf5ff;
+      }
+      .bg-orange {
+        background: #fff7ed;
+      }
+      .bg-blue {
+        background: #eff6ff;
+      }
+      .bg-red {
+        background: #fef2f2;
+      }
+      .bg-slate {
+        background: #f8fafc;
+      }
+
+      /* ── 아이콘 색 ── */
+      .c-green {
+        color: #22c55e;
+      }
+      .c-purple {
+        color: #a855f7;
+      }
+      .c-orange {
+        color: #f97316;
+      }
+      .c-blue {
+        color: #3b82f6;
+      }
+      .c-red {
+        color: #ef4444;
+      }
+      .c-teal {
+        color: #0f9689;
+      }
+      .c-slate {
+        color: #64748b;
+      }
+
+      /* ── 정보 박스 (서류 안내) ── */
+      .info-box {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 16px;
+      }
+      .info-box-inner {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .info-icon {
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        flex-shrink: 0;
+      }
+      .info-box-title {
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 10px;
+      }
+      .info-box ul {
+        list-style: none;
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.7;
+        word-break: keep-all;
+      }
+
+      /* ── 본문 텍스트 ── */
+      .body-text {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.7;
+        margin-bottom: 32px;
+      }
+      .body-text p + p {
+        margin-top: 16px;
+      }
+
+      /* ── 인포그래픽 이미지 ── */
+      .info-image {
+        width: 100%;
+        border-radius: 16px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+        margin-bottom: 32px;
+      }
+
+      /* ── 상담방식 섹션 ── */
+      .guide-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .guide-section {
+        margin-bottom: 24px;
+      }
+      .guide-section h3 {
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #0f172a;
+        margin-bottom: 8px;
+      }
+      .guide-section ul {
+        list-style: disc;
+        padding-left: 20px;
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.8;
+      }
+      .guide-section p {
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.7;
+      }
+      .guide-notice {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 0.9rem;
+        color: #64748b;
+        font-style: italic;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      /* ── 버튼 (공통) ── */
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 2px solid #e2e8f0;
+        border-radius: 100px;
+        background: #fff;
+        font-family: "NanumSquare", sans-serif;
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: #1e293b;
+        padding: 0 28px;
+        height: 56px;
+        cursor: pointer;
+        width: 100%;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .btn-home {
+        margin-top: auto;
+        padding-top: 40px;
+        padding-bottom: 32px;
+      }
+
+      /* ── 외부링크 버튼 ── */
+      .btn-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 2px solid #dbeafe;
+        background: rgba(239, 246, 255, 0.3);
+        border-radius: 16px;
+        padding: 0 24px;
+        height: 64px;
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        width: 100%;
+        font-family: "NanumSquare", sans-serif;
+        transition: background 0.15s;
+      }
+      .btn-link:active {
+        background: rgba(239, 246, 255, 0.8);
+      }
+      .btn-link-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .btn-link-right {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+
+      /* ── 공유 버튼 영역 ── */
+      .share-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        margin-top: auto;
+        padding-top: 48px;
+        padding-bottom: 48px;
+      }
+      .share-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+      }
+      .share-label {
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: #1e293b;
+        white-space: nowrap;
+      }
+      .share-btns {
+        display: flex;
+        gap: 12px;
+      }
+      .btn-kakao {
+        height: 56px;
+        padding: 0 24px;
+        border-radius: 10px;
+        border: 2px solid #fde68a;
+        background: rgba(254, 249, 195, 0.3);
+        font-family: "NanumSquare", sans-serif;
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        transition: background 0.15s;
+      }
+      .btn-kakao:active {
+        background: rgba(254, 249, 195, 0.8);
+      }
+      .btn-msg {
+        height: 56px;
+        padding: 0 24px;
+        border-radius: 10px;
+        border: 2px solid #bae6fd;
+        background: rgba(224, 242, 254, 0.3);
+        font-family: "NanumSquare", sans-serif;
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        transition: background 0.15s;
+      }
+      .btn-msg:active {
+        background: rgba(224, 242, 254, 0.8);
+      }
+
+      /* ── 토스트 ── */
+      .toast {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: #fff;
+        padding: 14px 28px;
+        border-radius: 100px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        white-space: nowrap;
+        z-index: 999;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      /* ── 상세 페이지 카드 ── */
+      .detail-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+        padding: 32px 24px 24px;
+        margin-bottom: 32px;
+      }
+      .video-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 2px solid #fecaca;
+        background: rgba(254, 242, 242, 0.3);
+        border-radius: 16px;
+        padding: 20px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .video-card:active {
+        background: rgba(254, 242, 242, 0.8);
+      }
+      .video-card-text {
+        text-align: center;
+      }
+      .video-card-title {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: #1e293b;
+        line-height: 1.3;
+      }
+      .video-card-desc {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ══════════════════════════════════════════
+     홈 화면
+══════════════════════════════════════════ -->
+    <div id="page-home" class="page active">
+      <div class="inner">
+        <div class="page-header">
+          <img
+            class="nhis-logo"
+            src="https://www.nhis.or.kr/_res/nhis/nhis/img/newimg/common/logo.png"
+            alt="국민건강보험 로고"
+          />
+          <div class="home-title">
+            대전세종충청지역<br /><span class="accent">다제약물 관리사업</span>
+          </div>
+          <div class="home-year">(2026년)</div>
+        </div>
+
+        <div>
+          <div class="card clickable" onclick="go('details')">
+            <div class="card-row">
+              <div class="card-icon bg-green">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-green"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div><div class="card-title">다제약물 관리사업 내용</div></div>
+            </div>
+          </div>
+
+          <div class="card clickable" onclick="go('pharmacist')">
+            <div class="card-row">
+              <div class="card-icon bg-purple">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-purple"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                  <polyline points="16 11 18 13 22 9" />
+                </svg>
+              </div>
+              <div>
+                <div class="card-title">다제약물 자문약사 신청안내</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card clickable" onclick="go('guide')">
+            <div class="card-row">
+              <div class="card-icon bg-orange">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-orange"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
+                </svg>
+              </div>
+              <div><div class="card-title">상담방식 안내</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="share-area">
+          <div class="share-row">
+            <span class="share-label">공유하기</span>
+            <div class="share-btns">
+              <button class="btn-kakao" onclick="shareKakao()">카카오톡</button>
+              <button class="btn-msg" onclick="shareMsg()">메세지</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     다제약물 관리사업 내용
+══════════════════════════════════════════ -->
+    <div id="page-details" class="page">
+      <div class="inner">
+        <div class="page-header">
+          <img
+            class="nhis-logo"
+            src="https://www.nhis.or.kr/_res/nhis/nhis/img/newimg/common/logo.png"
+            alt="국민건강보험 로고"
+          />
+          <div class="page-title">다제약물 관리사업 [지역사회모형]</div>
+        </div>
+
+        <div class="detail-card">
+          <div class="body-text">
+            <p>
+              만성질환을 보유하고, 10종 이상 약물을 복용하시는 건강보험 가입자
+              중 약물 이용에 어려움을 겪고 계시는 분께 의약전문가가 복용중인
+              약물을 점검하고 상담하는 약물 관리 서비스입니다. (건강보험
+              비가입자, 의료급여 등 제외)
+            </p>
+            <p>
+              공단에서 발송한 안내문을 회신하거나 사업에 참여하는 의료기관, 약국
+              등에서 참여 신청을 할 수 있습니다.
+            </p>
+          </div>
+
+          <img
+            class="info-image"
+            src="https://www.nhis.or.kr/_res/nhis/nhis/img/images/img_wbhaze01900m03_03.png"
+            alt="사업 안내 그림"
+          />
+
+          <div
+            class="video-card"
+            onclick="openUrl('https://youtu.be/A1u6uN5BQoo?si=9bwahdh10qWQeg2k')"
+          >
+            <div class="card-icon bg-red" style="flex-shrink: 0">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="c-red"
+              >
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </div>
+            <div class="video-card-text">
+              <div class="video-card-title">
+                다제약물 관리사업<br />홍보영상
+              </div>
+              <div class="video-card-desc">유튜브에서 보기</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-home">
+          <button class="btn" onclick="go('home')">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            처음으로
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     약사용 신청안내
+══════════════════════════════════════════ -->
+    <div id="page-pharmacist" class="page">
+      <div class="inner">
+        <div class="page-header">
+          <img
+            class="nhis-logo"
+            src="https://www.nhis.or.kr/_res/nhis/nhis/img/newimg/common/logo.png"
+            alt="국민건강보험 로고"
+          />
+          <div class="page-title">(약사용)<br />다제약물 자문약사 신청안내</div>
+        </div>
+
+        <div>
+          <div
+            class="card clickable"
+            onclick="openUrl('https://www.kpanet.or.kr/board.cm?menuCd=1002010000&boardSeq=223750')"
+          >
+            <div class="card-row">
+              <div class="card-icon bg-purple">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-purple"
+                >
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </div>
+              <div>
+                <div class="card-title">대한약사회 공지사항</div>
+                <div class="card-desc">신청방법, 서류 확인</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <div class="info-box-inner">
+              <div class="info-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-slate"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div>
+                <div class="info-box-title">제출 서류 안내</div>
+                <ul>
+                  <li>① 약사면허증‧신분증‧통장 사본</li>
+                  <li>
+                    ② 다제약물 관리사업 참여신청서 및 개인정보 수집‧이용동의서
+                  </li>
+                  <li>③ 보안각서</li>
+                  <li>④ 계좌입금의뢰신고서</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="card clickable"
+            onclick="openUrl('https://pharmcare.kpanet.or.kr/')"
+          >
+            <div class="card-row">
+              <div class="card-icon bg-blue">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="c-blue"
+                >
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </div>
+              <div>
+                <div class="card-title">대한약사회 지역사회약료</div>
+                <div class="card-desc">사업 안내 바로가기</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-home">
+          <button class="btn" onclick="go('home')">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            처음으로
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+     상담방식 안내
+══════════════════════════════════════════ -->
+    <div id="page-guide" class="page">
+      <div class="inner">
+        <div class="page-header">
+          <img
+            class="nhis-logo"
+            src="https://www.nhis.or.kr/_res/nhis/nhis/img/newimg/common/logo.png"
+            alt="국민건강보험 로고"
+          />
+          <div class="page-title">상담방식 안내</div>
+        </div>
+
+        <div class="guide-card">
+          <div class="guide-section">
+            <h3>1. 가정방문 (2인 1조)</h3>
+            <ul>
+              <li>약사와 공단직원 1인 동행</li>
+              <li>약사 2인 동행 (2인 약사)</li>
+              <li>약사와 보조인력 (약대생)</li>
+            </ul>
+          </div>
+
+          <div class="guide-section">
+            <h3>2. 약국상담방문</h3>
+            <p>
+              상담에 방해받지 않는 공간과 시간대를 정해 진행하실 수 있습니다.
+            </p>
+          </div>
+
+          <div class="guide-notice">
+            지역사회 모형으로 상담하는 경우의 기준입니다. 모든 상담인력은 공단에
+            등록-승인 후에 활동할 수 있습니다.
+          </div>
+
+          <button
+            class="btn-link"
+            onclick="openUrl('https://www.dailypharm.com/user/news/334600?REFERER=NP')"
+          >
+            <div class="btn-link-left">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#3b82f6"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+              <span>[상담수가 안내]</span>
+            </div>
+            <div class="btn-link-right">자세히 보기</div>
+          </button>
+        </div>
+
+        <div class="btn-home">
+          <button class="btn" onclick="go('home')">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            처음으로
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 토스트 ── -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      var KAKAO_KEY = "9217298f01ac4a8c0f436ce6752c18ae";
+
+      // ── 카카오 초기화 ──
+      if (window.Kakao && !window.Kakao.isInitialized()) {
+        window.Kakao.init(KAKAO_KEY);
+      }
+
+      // ── 페이지 이동 ──
+      function go(page) {
+        document.querySelectorAll(".page").forEach(function (p) {
+          p.classList.remove("active");
+        });
+        var el = document.getElementById("page-" + page);
+        if (el) {
+          el.classList.add("active");
+          window.scrollTo(0, 0);
+        }
+      }
+
+      // ── 외부 링크 열기 ──
+      function openUrl(url) {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      // ── 토스트 ──
+      function showToast(msg) {
+        var t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(function () {
+          t.classList.remove("show");
+        }, 2500);
+      }
+
+      // ── 카카오톡 공유 ──
+      function shareKakao() {
+        var url = window.location.href;
+        var text = "국민건강보험공단 다제약물 관리사업 안내";
+        if (window.Kakao && window.Kakao.isInitialized()) {
+          window.Kakao.Share.sendDefault({
+            objectType: "feed",
+            content: {
+              title: text,
+              description: "대전세종충청지역 다제약물 관리사업 안내입니다.",
+              imageUrl:
+                "https://www.nhis.or.kr/_res/nhis/nhis/img/newimg/common/logo.png",
+              link: { mobileWebUrl: url, webUrl: url },
+            },
+            buttons: [
+              {
+                title: "자세히 보기",
+                link: { mobileWebUrl: url, webUrl: url },
+              },
+            ],
+          });
+        } else {
+          navigator.clipboard.writeText(url).then(function () {
+            showToast("링크가 복사되었습니다");
+          });
+        }
+      }
+
+      // ── 문자 공유 ──
+      function shareMsg() {
+        var url = window.location.href;
+        var text = "국민건강보험공단 다제약물 관리사업 안내";
+        window.location.href =
+          "sms:?body=" + encodeURIComponent(text + " " + url);
+      }
+    </script>
+  </body>
+</html>
